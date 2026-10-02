@@ -1,0 +1,90 @@
+[build-system]
+requires = ["hatchling==1.32.4"]
+build-backend = "hatchling.build"
+
+[project]
+name = "useceleris-server"
+version = "0.0.0b1"
+description = "Celeris credential signing for trusted servers"
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+authors = [{ name = "David Oyinbo", email = "dev.davexoyinbo@gmail.com" }]
+keywords = ["celeris", "realtime", "websocket", "credentials", "signing"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Framework :: AsyncIO",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Typing :: Typed",
+]
+# The client is pinned exactly: the two are released together, and an
+# application using both gets the one client the provider was built against.
+# Third-party libraries take ranges, so the SDK installs beside applications
+# that pin their own versions.
+dependencies = [
+  "pydantic>=2.13.5,<3",
+  "typing-extensions>=4.14.1",
+  "useceleris-client==0.0.0b1",
+]
+
+[project.urls]
+Homepage = "https://useceleris.com"
+Repository = "https://github.com/useceleris/sdk-py-server"
+
+[dependency-groups]
+dev = [
+  "build==1.6.1",
+  "mypy==2.4.0",
+  "nox==2026.8.17",
+  "pytest==9.1.1",
+  "pytest-asyncio==1.4.0",
+  "pytest-timeout==2.4.0",
+  "ruff==0.16.10",
+]
+
+[tool.hatch.build.targets.sdist]
+only-include = ["src", "README.md", "LICENSE"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/useceleris_server"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+addopts = ["--strict-markers", "--strict-config", "-m", "not live"]
+markers = ["live: runs against the realtime service configured in .env"]
+# A test that hangs fails instead of stalling the run.
+timeout = 60
+filterwarnings = ["error"]
+
+[tool.mypy]
+strict = true
+python_version = "3.10"
+files = ["src", "tests", "examples", "noxfile.py"]
+
+# Tests assert a channel's state before and after events; mypy keeps the
+# first assertion's narrowing of the property across the awaits between them.
+[[tool.mypy.overrides]]
+module = "tests.*"
+disable_error_code = ["comparison-overlap"]
+
+[tool.ruff]
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "UP", "SIM", "RUF", "PT", "ASYNC", "C4", "PIE", "RET"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["useceleris_server"]
+known-third-party = ["useceleris_client"]
