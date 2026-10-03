@@ -1,8 +1,8 @@
 """The check: `nox` runs lint, typecheck, tests and package on every supported
 Python. `nox -s live` runs the suites against the realtime service in .env.
 
-The client this package depends on is released with it, so it is installed
-from its source checkout: CELERIS_CLIENT_SOURCE, or ../sdk-py-client."""
+The pinned useceleris-client comes from PyPI. To work against an unreleased
+client, set CELERIS_CLIENT_SOURCE to its checkout, such as ../sdk-py-client."""
 
 import os
 import shutil
@@ -23,9 +23,7 @@ ROOT = Path(__file__).parent
 
 PACKAGE = "useceleris_server"
 
-CLIENT_SOURCE = Path(
-    os.environ.get("CELERIS_CLIENT_SOURCE", ROOT.parent / "sdk-py-client")
-).resolve()
+CLIENT_SOURCE = os.environ.get("CELERIS_CLIENT_SOURCE")
 
 DEVELOPMENT = nox.project.dependency_groups(
     nox.project.load_toml("pyproject.toml"), "dev"
@@ -40,7 +38,10 @@ def requirement(name: str) -> str:
 
 
 def install_development(session: nox.Session) -> None:
-    session.install("-e", str(CLIENT_SOURCE), "-e", ".", *DEVELOPMENT)
+    if CLIENT_SOURCE:
+        session.install("-e", CLIENT_SOURCE)
+
+    session.install("-e", ".", *DEVELOPMENT)
 
 
 @nox.session(python="3.14")
@@ -71,27 +72,29 @@ def live(session: nox.Session) -> None:
 @nox.session(python=PYTHONS)
 def package(session: nox.Session) -> None:
     """Builds the sdist and wheel, checks what they contain, installs the wheel
-    beside the client's and uses it as a consumer would."""
+    and uses it as a consumer would."""
     session.install(requirement("build"), requirement("mypy"))
     work = Path(session.create_tmp())
     distribution = work / "dist"
     shutil.rmtree(distribution, ignore_errors=True)
     session.run("python", "-m", "build", "--outdir", str(distribution), str(ROOT))
-    session.run(
-        "python",
-        "-m",
-        "build",
-        "--wheel",
-        "--outdir",
-        str(work / "client"),
-        str(CLIENT_SOURCE),
-    )
-
     (wheel,) = distribution.glob("*.whl")
-    (client_wheel,) = (work / "client").glob("*.whl")
     check_wheel(wheel)
 
-    session.install("--force-reinstall", str(client_wheel), str(wheel))
+    # The client from its checkout when one is set, installed in the same
+    # command so pip takes it for the pin; otherwise pip installs the pinned
+    # release.
+    wheels = [str(wheel)]
+
+    if CLIENT_SOURCE:
+        clients = work / "client"
+        shutil.rmtree(clients, ignore_errors=True)
+        session.run(
+            "python", "-m", "build", "--wheel", "--outdir", str(clients), CLIENT_SOURCE
+        )
+        wheels.extend(str(client) for client in clients.glob("*.whl"))
+
+    session.install("--force-reinstall", *wheels)
     consumer = work / "consumer"
     shutil.rmtree(consumer, ignore_errors=True)
     consumer.mkdir()

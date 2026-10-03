@@ -106,7 +106,7 @@ channel = client.channel("room-42")
 await channel.connect()
 ```
 
-`claims_for` is authoritative: nothing from the request can widen scope beyond what it returns. It may also be an `async def`, for claims that need a database lookup; cancelling the connection attempt while it runs cancels it, and nothing is signed.
+`claims_for` is authoritative: nothing from the request can widen scope beyond what it returns. If it returns invalid claims, the connection attempt fails with the client's generic `Transport` error, which never repeats what went wrong; check a claims function by signing its result directly, `signer.sign(claims_for(request))`, which raises a `ConfigurationError` naming the claim and the rule. It may also be an `async def`, for claims that need a database lookup; cancelling the connection attempt while it runs cancels it, and nothing is signed.
 
 ## Errors
 

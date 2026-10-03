@@ -3,28 +3,28 @@ import subprocess
 import sys
 from pathlib import Path
 
-import useceleris_server
-
 ROOT = Path(__file__).resolve().parents[1]
 
-# The names the snippets assume are already in scope, as a reader would.
-PREAMBLE = f"""
-from typing import Protocol
+# The objects the snippets assume already exist, as a reader would. The SDK is
+# bound only under a private alias, so a snippet must import every name it
+# uses.
+PREAMBLE = """
+from typing import Protocol as _Protocol
 
-from useceleris_server import {", ".join(useceleris_server.__all__)}
+import useceleris_server as _celeris
 
 
-class User(Protocol):
+class User(_Protocol):
     reference: str
 
     def may_access(self, channel_reference: str) -> bool: ...
 
 
-def permissions_for(user: User, channel_reference: str) -> SegmentPermissions:
+def permissions_for(user: User, channel_reference: str) -> _celeris.SegmentPermissions:
     raise NotImplementedError
 
 
-signer: Signer
+signer: _celeris.Signer
 """
 
 

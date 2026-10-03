@@ -27,7 +27,7 @@ credentials = signer.sign(
 pip install --pre useceleris-server
 ```
 
-Python 3.10 to 3.14. It installs `useceleris-client`, released alongside it, for the credential types and errors.
+Python 3.10 to 3.14. It installs the matching `useceleris-client` for the credential types and errors.
 
 ## Signing
 
@@ -60,13 +60,18 @@ Credentials are short-lived and opaque. Sign per request or per connection attem
 
 ## Development
 
-`nox` runs the whole check: lint, `mypy --strict`, the unit suites on every supported Python, and the package check (build, install the wheel beside the client's, verify its contents and dependencies). The client is installed from its source checkout: `CELERIS_CLIENT_SOURCE`, or `../sdk-py-client`. `nox -s live` runs the acceptance suites against a real Celeris stack, reading `CELERIS_WS_URL`, `CELERIS_CLIENT_ID` and `CELERIS_SIGNING_SECRET` from a gitignored `.env` or the environment.
+`nox` runs the whole check: lint, `mypy --strict`, the unit suites on every supported Python, and the package check (build, install the wheel, verify its contents and dependencies, and sign every vector with it). `nox -s live` runs the acceptance suites against a real Celeris stack, reading `CELERIS_WS_URL`, `CELERIS_CLIENT_ID` and `CELERIS_SIGNING_SECRET` from a gitignored `.env` or the environment.
+
+The pinned `useceleris-client` comes from PyPI, so a client release precedes the server release that pins it. To work against an unreleased client, set `CELERIS_CLIENT_SOURCE` to its checkout:
 
 ```sh
 python3 -m venv .venv
-.venv/bin/pip install -e ../sdk-py-client -e . --group dev
+.venv/bin/pip install -e . --group dev
 .venv/bin/nox
+CELERIS_CLIENT_SOURCE=../sdk-py-client .venv/bin/nox
 ```
+
+`make release` runs that check, builds, and uploads to PyPI from a clean git tree; `make release-test` rehearses on TestPyPI, and `make smoke` installs the published version in a fresh environment. The server's release check installs the pinned client from PyPI, even when `CELERIS_CLIENT_SOURCE` is set, so release the client first.
 
 Read [CONVENTIONS.md](CONVENTIONS.md) before contributing, and [SECURITY.md](SECURITY.md) before reporting a vulnerability.
 
