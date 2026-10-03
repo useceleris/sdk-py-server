@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "useceleris-server"
-version = "0.0.0b1"
+version = "0.0.0b3"
 description = "Celeris credential signing for trusted servers"
 readme = "README.md"
 license = "Apache-2.0"
@@ -33,7 +33,7 @@ classifiers = [
 dependencies = [
   "pydantic>=2.13.5,<3",
   "typing-extensions>=4.14.1",
-  "useceleris-client==0.0.0b1",
+  "useceleris-client>=0.0.0b3",
 ]
 
 [project.urls]
@@ -82,7 +82,21 @@ target-version = "py310"
 src = ["src", "tests"]
 
 [tool.ruff.lint]
-select = ["E", "W", "F", "I", "B", "UP", "SIM", "RUF", "PT", "ASYNC", "C4", "PIE", "RET"]
+select = [
+  "E",
+  "W",
+  "F",
+  "I",
+  "B",
+  "UP",
+  "SIM",
+  "RUF",
+  "PT",
+  "ASYNC",
+  "C4",
+  "PIE",
+  "RET",
+]
 
 [tool.ruff.lint.isort]
 known-first-party = ["useceleris_server"]

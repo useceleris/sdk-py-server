@@ -750,7 +750,7 @@ wheels = [
 
 [[package]]
 name = "useceleris-client"
-version = "0.0.0b1"
+version = "0.0.0b3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
@@ -758,14 +758,14 @@ dependencies = [
     { name = "websockets", version = "16.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "websockets", version = "17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d8/bb/1a31b14e5178d202e9178791b4105031c2c400d6cc4527d8ebf232464f2c/useceleris_client-0.0.0b1.tar.gz", hash = "sha256:fbebe9d666c01a5574dff06c627c1b9a7e87685ebf70aa3bc00ca0521e29d959", size = 37568, upload-time = "2026-10-03T01:46:38.958Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/01/59/76c4e94c0a0d10cf071936b544c0cb7ed342e352eb735382912237dde4ec/useceleris_client-0.0.0b3.tar.gz", hash = "sha256:0024ccd45dd072be1d0039036206222c9b695079cee30fe6de3b5725265cd104", size = 37675, upload-time = "2026-10-03T02:43:25.809Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/aa/71/34901f021ff4d1c2cc5c4f9ac9f95876c4cedfe3d901e1def2cd4d8f4029/useceleris_client-0.0.0b1-py3-none-any.whl", hash = "sha256:83b19ed7082e0c1318b61289c26d6083337fad540e6871c161537a243ec85c04", size = 46729, upload-time = "2026-10-03T01:46:37.802Z" },
+    { url = "https://files.pythonhosted.org/packages/4d/f5/d23f10f907b2fdb56baf58334b4f43c6c034cac605eadaf0fd347a2efbe3/useceleris_client-0.0.0b3-py3-none-any.whl", hash = "sha256:63e1771e11f78b1bead591dcabbd3b9491179eac4e62f448ebaf4a1074871327", size = 46868, upload-time = "2026-10-03T02:43:24.88Z" },
 ]
 
 [[package]]
 name = "useceleris-server"
-version = "0.0.0b1"
+version = "0.0.0b3"
 source = { editable = "." }
 dependencies = [
     { name = "pydantic" },
@@ -787,7 +787,7 @@ dev = [
 requires-dist = [
     { name = "pydantic", specifier = ">=2.13.5,<3" },
     { name = "typing-extensions", specifier = ">=4.14.1" },
-    { name = "useceleris-client", specifier = "==0.0.0b1" },
+    { name = "useceleris-client", specifier = ">=0.0.0b3" },
 ]
 
 [package.metadata.requires-dev]
