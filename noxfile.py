@@ -13,7 +13,7 @@ from pathlib import Path
 import nox
 from packaging.requirements import Requirement
 
-nox.options.default_venv_backend = "venv"
+nox.options.default_venv_backend = "uv"
 nox.options.reuse_venv = "yes"
 nox.options.sessions = ["lint", "typecheck", "tests", "package"]
 
@@ -73,24 +73,30 @@ def live(session: nox.Session) -> None:
 def package(session: nox.Session) -> None:
     """Builds the sdist and wheel, checks what they contain, installs the wheel
     and uses it as a consumer would."""
-    session.install(requirement("build"), requirement("mypy"))
+    session.install(requirement("mypy"))
     work = Path(session.create_tmp())
     distribution = work / "dist"
     shutil.rmtree(distribution, ignore_errors=True)
-    session.run("python", "-m", "build", "--outdir", str(distribution), str(ROOT))
+    session.run("uv", "build", "--out-dir", str(distribution), str(ROOT), external=True)
     (wheel,) = distribution.glob("*.whl")
     check_wheel(wheel)
 
     # The client from its checkout when one is set, installed in the same
-    # command so pip takes it for the pin; otherwise pip installs the pinned
-    # release.
+    # command so it satisfies the pin; otherwise the pinned release is
+    # installed from PyPI.
     wheels = [str(wheel)]
 
     if CLIENT_SOURCE:
         clients = work / "client"
         shutil.rmtree(clients, ignore_errors=True)
         session.run(
-            "python", "-m", "build", "--wheel", "--outdir", str(clients), CLIENT_SOURCE
+            "uv",
+            "build",
+            "--wheel",
+            "--out-dir",
+            str(clients),
+            CLIENT_SOURCE,
+            external=True,
         )
         wheels.extend(str(client) for client in clients.glob("*.whl"))
 

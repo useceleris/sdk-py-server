@@ -60,16 +60,17 @@ Credentials are short-lived and opaque. Sign per request or per connection attem
 
 ## Development
 
-`nox` runs the whole check: lint, `mypy --strict`, the unit suites on every supported Python, and the package check (build, install the wheel, verify its contents and dependencies, and sign every vector with it). `nox -s live` runs the acceptance suites against a real Celeris stack, reading `CELERIS_WS_URL`, `CELERIS_CLIENT_ID` and `CELERIS_SIGNING_SECRET` from a gitignored `.env` or the environment.
+`uv run nox` runs the whole check: lint, `mypy --strict`, the unit suites on every supported Python, and the package check (build, install the wheel, verify its contents and dependencies, and sign every vector with it). `uv run nox -s live` runs the acceptance suites against a real Celeris stack, reading `CELERIS_WS_URL`, `CELERIS_CLIENT_ID` and `CELERIS_SIGNING_SECRET` from a gitignored `.env` or the environment.
 
-The pinned `useceleris-client` comes from PyPI, so a client release precedes the server release that pins it. To work against an unreleased client, set `CELERIS_CLIENT_SOURCE` to its checkout:
+The pinned `useceleris-client` comes from PyPI, so a client release precedes the server release that pins it. To work against an unreleased client, set `CELERIS_CLIENT_SOURCE` to its checkout, with `--frozen` so uv keeps the lock instead of resolving a pin PyPI does not have yet:
 
 ```sh
-python3 -m venv .venv
-.venv/bin/pip install -e . --group dev
-.venv/bin/nox
-CELERIS_CLIENT_SOURCE=../sdk-py-client .venv/bin/nox
+uv sync
+uv run nox
+CELERIS_CLIENT_SOURCE=../sdk-py-client uv run --frozen nox
 ```
+
+`uv sync` creates `.venv` with the package and its development tools, at the versions in `uv.lock`. `uv add` and `uv remove` change a dependency in `pyproject.toml` and `uv.lock` together: give a runtime dependency a range (`uv add "httpx>=0.28,<1"`) and pin a tool exactly (`uv add --group dev "coverage==7.10.0"`).
 
 `make release` runs that check, builds, and uploads to PyPI from a clean git tree; `make release-test` rehearses on TestPyPI, and `make smoke` installs the published version in a fresh environment. The server's release check installs the pinned client from PyPI, even when `CELERIS_CLIENT_SOURCE` is set, so release the client first.
 
