@@ -20,7 +20,7 @@ A backend that itself publishes or receives uses `useceleris-client` like any ot
 ## Install
 
 ```sh
-pip install --pre useceleris-server
+pip install useceleris-server
 ```
 
 Python 3.10 to 3.14, with type information (`py.typed`). It installs `useceleris-client`, whose `Credentials`, `CredentialRequest` and `ConfigurationError` it uses; the client never depends on this package. Install it only where the signing secret may live.

@@ -25,10 +25,9 @@ classifiers = [
   "Programming Language :: Python :: 3.14",
   "Typing :: Typed",
 ]
-# The client is pinned exactly: the two are released together, and an
-# application using both gets the one client the provider was built against.
-# Third-party libraries take ranges, so the SDK installs beside applications
-# that pin their own versions.
+# The client takes a minimum version: the release that this provider was
+# built and tested against, or a later compatible one. All dependencies take
+# ranges, so the SDK installs beside applications that pin their own versions.
 dependencies = [
   "pydantic>=2.13.5,<3",
   "typing-extensions>=4.14.1",
