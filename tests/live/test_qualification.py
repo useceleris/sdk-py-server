@@ -79,13 +79,13 @@ class TestServerSignedCredentials:
 
     # end method test_rejects_a_wrong_secret_and_an_unknown_client_as_transport
 
-    async def test_rejects_expired_and_future_clocks_inside_the_observed_window(
-        self,
-    ) -> None:
+    async def test_rejects_timestamps_outside_the_60_second_window(self) -> None:
+        # D-001: the server accepts a signed timestamp that is at most 60
+        # seconds old and not in the future.
         reference = unique_channel_reference("window")
         claims = all_permission_claims(reference)
 
-        for offset_ms in [-61 * 60 * 1_000, 5 * 60 * 1_000]:
+        for offset_ms in [-61 * 1_000, -59 * 60 * 1_000, 5 * 60 * 1_000]:
             channel = qualification_client(claims, clock=shifted(offset_ms)).channel(
                 reference
             )
@@ -95,15 +95,13 @@ class TestServerSignedCredentials:
 
             assert caught.value.code == "Transport"
 
-        # D-001: the server accepts up to the observed 60-minute window against
-        # a documented 60-second intent; recorded, not relied upon.
-        stale = qualification_client(claims, clock=shifted(-59 * 60 * 1_000)).channel(
+        recent = qualification_client(claims, clock=shifted(-30 * 1_000)).channel(
             reference
         )
-        await stale.connect()
-        await stale.close()
+        await recent.connect()
+        await recent.close()
 
-    # end method test_rejects_expired_and_future_clocks_inside_the_observed_window
+    # end method test_rejects_timestamps_outside_the_60_second_window
 
     async def test_enforces_the_tokens_channel_restriction(self) -> None:
         allowed = unique_channel_reference("scope-allowed")
