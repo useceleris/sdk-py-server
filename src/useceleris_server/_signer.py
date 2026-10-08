@@ -26,6 +26,9 @@ def _now_ms() -> int:
     return time.time_ns() // 1_000_000
 
 
+# end function _now_ms
+
+
 class Signer:
     """Signs short-lived credentials. It holds the signing secret, so it
     belongs on a trusted server only."""
@@ -46,9 +49,13 @@ class Signer:
         self._signing_secret = options["signing_secret"]
         self._clock = _now_ms if options["clock"] is None else options["clock"]
 
+    # end method __init__
+
     def __repr__(self) -> str:
         # Never shows the signing secret.
         return "Signer()"
+
+    # end method __repr__
 
     def sign(self, claims: SigningClaims) -> Credentials:
         """Synchronous: validates the claims, stamps the current time and
@@ -64,6 +71,11 @@ class Signer:
 
         return Credentials(payload=payload, signature=signature)
 
+    # end method sign
+
+
+# end class Signer
+
 
 def create_signer(
     *,
@@ -72,6 +84,9 @@ def create_signer(
     clock: Callable[[], int] | None = None,
 ) -> Signer:
     return Signer(client_id=client_id, signing_secret=signing_secret, clock=clock)
+
+
+# end function create_signer
 
 
 def _prepare_token_payload(claims: object, clock: Callable[[], int]) -> dict[str, Any]:
@@ -104,10 +119,14 @@ def _prepare_token_payload(claims: object, clock: Callable[[], int]) -> dict[str
     )
 
     permissions = validated["permissions"]
-    token["token_permission"] = (
-        {"read": permissions["read"], "write": permissions["write"]}
-        if permissions["kind"] == "all"
-        else [
+
+    if permissions["kind"] == "all":
+        token["token_permission"] = {
+            "read": permissions["read"],
+            "write": permissions["write"],
+        }
+    else:
+        token["token_permission"] = [
             {
                 "segment_id": segment["segment_id"],
                 "read": segment["read"],
@@ -115,9 +134,12 @@ def _prepare_token_payload(claims: object, clock: Callable[[], int]) -> dict[str
             }
             for segment in permissions["segments"]
         ]
-    )
 
     replay = validated.get("replay", False)
     token["replay"] = replay if isinstance(replay, bool) else replay["lookback_ms"]
     token["allow_echo"] = validated.get("allow_echo", False)
+
     return token
+
+
+# end function _prepare_token_payload

@@ -43,20 +43,35 @@ def now_ms() -> int:
     return int(time.time() * 1000)
 
 
+# end function now_ms
+
+
 def websocket_url() -> str:
     return os.environ["CELERIS_WS_URL"]
+
+
+# end function websocket_url
 
 
 def client_id() -> str:
     return os.environ["CELERIS_CLIENT_ID"]
 
 
+# end function client_id
+
+
 def signing_secret() -> str:
     return os.environ["CELERIS_SIGNING_SECRET"]
 
 
+# end function signing_secret
+
+
 def unique_channel_reference(label: str) -> str:
     return f"pyqual-server-{label}-{now_ms()}-{next(_channel_counter)}"
+
+
+# end function unique_channel_reference
 
 
 def qualification_client(
@@ -82,6 +97,9 @@ def qualification_client(
     )
 
 
+# end function qualification_client
+
+
 def all_permission_claims(reference: str) -> SigningClaims:
     return {
         "channels": {"kind": "restricted", "references": [reference]},
@@ -89,11 +107,17 @@ def all_permission_claims(reference: str) -> SigningClaims:
     }
 
 
+# end function all_permission_claims
+
+
 async def connected_channel(reference: str, claims: Claims) -> Channel:
     channel = qualification_client(claims).channel(reference)
     await channel.connect()
 
     return channel
+
+
+# end function connected_channel
 
 
 async def wait_for(
@@ -108,6 +132,8 @@ async def wait_for(
         if not arrived.done() and predicate(value):
             arrived.set_result(value)
 
+    # end function deliver
+
     dispose = register(deliver)
 
     try:
@@ -118,10 +144,16 @@ async def wait_for(
         dispose()
 
 
+# end function wait_for
+
+
 @dataclass(frozen=True)
 class DeliveredMessage:
     payload: bytes
     metadata: MessageMetadata
+
+
+# end class DeliveredMessage
 
 
 async def next_message(
@@ -135,7 +167,12 @@ async def next_message(
             lambda payload, metadata: deliver(DeliveredMessage(payload, metadata))
         )
 
+    # end function register
+
     return await wait_for(register, predicate, description, timeout_s)
+
+
+# end function next_message
 
 
 async def next_notice(
@@ -144,6 +181,9 @@ async def next_notice(
     description: str = "a server notice",
 ) -> ServerNotice:
     return await wait_for(channel.events().on_notice, predicate, description)
+
+
+# end function next_notice
 
 
 async def next_presence(
@@ -155,9 +195,15 @@ async def next_presence(
     return await wait_for(segment.on_presence, predicate, description, timeout_s)
 
 
+# end function next_presence
+
+
 async def next_error(
     channel: Channel,
     predicate: Callable[[ChannelError], bool],
     description: str = "a channel error",
 ) -> ChannelError:
     return await wait_for(channel.events().on_error, predicate, description)
+
+
+# end function next_error

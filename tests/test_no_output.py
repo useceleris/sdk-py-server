@@ -18,3 +18,6 @@ def test_source_has_no_way_to_print_or_log() -> None:
                 assert node.module.split(".")[0] not in OUTPUT_MODULES, path.name
             elif isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
                 assert node.func.id != "print", f"{path.name} prints"
+
+
+# end function test_source_has_no_way_to_print_or_log

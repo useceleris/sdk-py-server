@@ -21,6 +21,11 @@ ClaimsCallback: TypeAlias = Callable[
 class SupportsSign(Protocol):
     def sign(self, claims: SigningClaims) -> Credentials: ...
 
+    # end method sign
+
+
+# end class SupportsSign
+
 
 def create_credential_provider(
     *, signer: SupportsSign, claims: ClaimsCallback
@@ -54,4 +59,9 @@ def create_credential_provider(
 
         return signer.sign(signing_claims)
 
+    # end function provide
+
     return provide
+
+
+# end function create_credential_provider

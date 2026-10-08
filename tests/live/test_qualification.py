@@ -26,6 +26,9 @@ def shifted(offset_ms: int) -> Callable[[], int]:
     return lambda: now_ms() + offset_ms
 
 
+# end function shifted
+
+
 class TestServerSignedCredentials:
     async def test_connects_with_server_signed_credentials(self) -> None:
         reference = unique_channel_reference("auth")
@@ -46,6 +49,8 @@ class TestServerSignedCredentials:
 
         assert any("Successfully connected" in notice for notice in notices)
         await channel.close()
+
+    # end method test_connects_with_server_signed_credentials
 
     async def test_rejects_a_wrong_secret_and_an_unknown_client_as_transport(
         self,
@@ -72,6 +77,8 @@ class TestServerSignedCredentials:
 
         assert caught.value.code == "Transport"
 
+    # end method test_rejects_a_wrong_secret_and_an_unknown_client_as_transport
+
     async def test_rejects_expired_and_future_clocks_inside_the_observed_window(
         self,
     ) -> None:
@@ -96,6 +103,8 @@ class TestServerSignedCredentials:
         await stale.connect()
         await stale.close()
 
+    # end method test_rejects_expired_and_future_clocks_inside_the_observed_window
+
     async def test_enforces_the_tokens_channel_restriction(self) -> None:
         allowed = unique_channel_reference("scope-allowed")
         denied = unique_channel_reference("scope-denied")
@@ -109,6 +118,11 @@ class TestServerSignedCredentials:
         inside = await connected_channel(allowed, claims)
         assert inside.state == "connected"
         await inside.close()
+
+    # end method test_enforces_the_tokens_channel_restriction
+
+
+# end class TestServerSignedCredentials
 
 
 class TestThroughTheProvider:
@@ -137,6 +151,8 @@ class TestThroughTheProvider:
         await publisher.close()
         await receiver.close()
 
+    # end method test_round_trips_a_payload_with_its_id_and_no_self_echo
+
     async def test_echoes_to_the_publisher_when_claims_allow_echo(self) -> None:
         reference = unique_channel_reference("echo")
         channel = await connected_channel(
@@ -154,6 +170,8 @@ class TestThroughTheProvider:
 
         assert GENERATED_MESSAGE_ID.fullmatch(echoed.metadata.message_id)
         await channel.close()
+
+    # end method test_echoes_to_the_publisher_when_claims_allow_echo
 
     async def test_denies_a_read_only_restricted_segments_publish(self) -> None:
         reference = unique_channel_reference("perm")
@@ -183,6 +201,8 @@ class TestThroughTheProvider:
         assert (denial.sub_type, denial.resource) == ("PUB", "chat")
         assert read_only.state == "connected"
         await read_only.close()
+
+    # end method test_denies_a_read_only_restricted_segments_publish
 
     async def test_replays_recent_messages_through_reconnect_claims(self) -> None:
         reference = unique_channel_reference("replay")
@@ -219,6 +239,8 @@ class TestThroughTheProvider:
                 },
             }
 
+        # end function replaying
+
         replay_receiver = await connected_channel(reference, replaying)
         replayed: dict[bytes, str] = {}
         replay_receiver.segment("history").on_message(
@@ -237,6 +259,8 @@ class TestThroughTheProvider:
 
         await publisher.close()
         await replay_receiver.close()
+
+    # end method test_replays_recent_messages_through_reconnect_claims
 
     async def test_surfaces_presence_for_a_server_signed_reference(self) -> None:
         reference = unique_channel_reference("presence")
@@ -272,3 +296,8 @@ class TestThroughTheProvider:
         )
         await actor.close()
         await watcher.close()
+
+    # end method test_surfaces_presence_for_a_server_signed_reference
+
+
+# end class TestThroughTheProvider

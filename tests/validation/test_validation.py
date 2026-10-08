@@ -25,6 +25,9 @@ def token_for(claims: object, clock: Any = lambda: 1) -> dict[str, Any]:
     return token
 
 
+# end function token_for
+
+
 @pytest.mark.parametrize(
     "replay", [False, True, {"lookback_ms": 0}, {"lookback_ms": 4294967295}]
 )
@@ -37,6 +40,9 @@ def test_preserves_replay(replay: Any) -> None:
     assert token["allow_echo"] is True
 
 
+# end function test_preserves_replay
+
+
 @pytest.mark.parametrize(
     "lookback_ms",
     [-1, 0.5, 4294967296, math.nan, math.inf, -math.inf, True, "0", None, 1.0],
@@ -46,10 +52,16 @@ def test_rejects_an_invalid_lookback(lookback_ms: object) -> None:
         token_for({**CLAIMS, "replay": {"lookback_ms": lookback_ms}})
 
 
+# end function test_rejects_an_invalid_lookback
+
+
 @pytest.mark.parametrize("replay", [None, 0, "false", [], {}])
 def test_rejects_a_malformed_replay(replay: object) -> None:
     with pytest.raises(ConfigurationError, match=r"^Invalid claims\. replay"):
         token_for({**CLAIMS, "replay": replay})
+
+
+# end function test_rejects_a_malformed_replay
 
 
 def test_names_a_malformed_replay_without_repeating_it() -> None:
@@ -62,10 +74,16 @@ def test_names_a_malformed_replay_without_repeating_it() -> None:
     )
 
 
+# end function test_names_a_malformed_replay_without_repeating_it
+
+
 @pytest.mark.parametrize("allow_echo", [None, 0, "false", [], {}])
 def test_rejects_a_malformed_echo(allow_echo: object) -> None:
     with pytest.raises(ConfigurationError, match=r"^Invalid claims\. allow_echo"):
         token_for({**CLAIMS, "allow_echo": allow_echo})
+
+
+# end function test_rejects_a_malformed_echo
 
 
 @pytest.mark.parametrize("timestamp", [1, 253402300799999])
@@ -74,6 +92,9 @@ def test_preserves_the_clock_endpoint_and_calls_it_once(timestamp: int) -> None:
 
     assert token_for(CLAIMS, clock)["timestamp"] == timestamp
     clock.assert_called_once_with()
+
+
+# end function test_preserves_the_clock_endpoint_and_calls_it_once
 
 
 @pytest.mark.parametrize(
@@ -99,6 +120,9 @@ def test_rejects_an_invalid_clock_value(timestamp: object) -> None:
         token_for(CLAIMS, lambda: timestamp)
 
 
+# end function test_rejects_an_invalid_clock_value
+
+
 def test_uses_the_current_time_when_no_clock_is_given(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -111,11 +135,16 @@ def test_uses_the_current_time_when_no_clock_is_given(
     assert token["timestamp"] == 456
 
 
+# end function test_uses_the_current_time_when_no_clock_is_given
+
+
 def test_validation_and_clock_errors_never_expose_values_or_causes() -> None:
     marker = "synthetic-sensitive-marker"
 
     def raise_marker() -> int:
         raise RuntimeError(marker)
+
+    # end function raise_marker
 
     operations: list[Callable[[], object]] = [
         lambda: token_for({**CLAIMS, "reference": f"{marker}\n"}),
@@ -133,9 +162,14 @@ def test_validation_and_clock_errors_never_expose_values_or_causes() -> None:
         assert marker not in repr(error)
 
 
+# end function test_validation_and_clock_errors_never_expose_values_or_causes
+
+
 def test_reports_a_clock_that_raises() -> None:
     def fail() -> int:
         raise RuntimeError("synthetic")
+
+    # end function fail
 
     with pytest.raises(ConfigurationError) as caught:
         token_for(CLAIMS, fail)
@@ -143,6 +177,9 @@ def test_reports_a_clock_that_raises() -> None:
     assert str(caught.value) == (
         "clock() raised an error instead of returning a millisecond timestamp."
     )
+
+
+# end function test_reports_a_clock_that_raises
 
 
 @pytest.mark.parametrize(
@@ -164,6 +201,9 @@ def test_names_a_replay_failure_at_the_claim_the_caller_wrote(
     assert str(caught.value) == f"Invalid claims. {message}"
 
 
+# end function test_names_a_replay_failure_at_the_claim_the_caller_wrote
+
+
 def test_reads_no_time_for_claims_it_refuses() -> None:
     clock = Mock(return_value=1)
 
@@ -171,6 +211,9 @@ def test_reads_no_time_for_claims_it_refuses() -> None:
         token_for({**CLAIMS, "reference": ""}, clock)
 
     clock.assert_not_called()
+
+
+# end function test_reads_no_time_for_claims_it_refuses
 
 
 def test_reads_the_default_clock_once_per_signature(
@@ -186,12 +229,24 @@ def test_reads_the_default_clock_once_per_signature(
     reads.assert_called_once_with()
 
 
+# end function test_reads_the_default_clock_once_per_signature
+
+
 def test_uses_a_supplied_clock_however_it_converts_to_bool() -> None:
     class FalsyClock:
         def __bool__(self) -> bool:
             return False
 
+        # end method __bool__
+
         def __call__(self) -> int:
             return 42
 
+        # end method __call__
+
+    # end class FalsyClock
+
     assert token_for(CLAIMS, FalsyClock())["timestamp"] == 42
+
+
+# end function test_uses_a_supplied_clock_however_it_converts_to_bool

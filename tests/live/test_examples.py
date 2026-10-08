@@ -44,11 +44,17 @@ def test_runs_the_quickstart() -> None:
     ), result.stdout
 
 
+# end function test_runs_the_quickstart
+
+
 def free_port() -> int:
     with socket.socket() as probe:
         probe.bind(("127.0.0.1", 0))
         port: int = probe.getsockname()[1]
         return port
+
+
+# end function free_port
 
 
 @pytest.fixture
@@ -73,6 +79,9 @@ def endpoint() -> Iterator[str]:
             process.stdout.close()
 
 
+# end function endpoint
+
+
 def post(url: str, authorization: str, channel_reference: str) -> tuple[int, bytes]:
     request = urllib.request.Request(
         url,
@@ -88,6 +97,9 @@ def post(url: str, authorization: str, channel_reference: str) -> tuple[int, byt
         status = error.code
         error.close()
         return status, b""
+
+
+# end function post
 
 
 async def test_mints_credentials_through_the_endpoint_and_connects_with_them(
@@ -110,6 +122,8 @@ async def test_mints_credentials_through_the_endpoint_and_connects_with_them(
     async def provide(request: CredentialRequest) -> Credentials:
         return credentials
 
+    # end function provide
+
     # The endpoint's credentials drive a real connection: the demo user is
     # read-only on "chat", so a publish is denied while reads work.
     reader = create_client(
@@ -123,6 +137,8 @@ async def test_mints_credentials_through_the_endpoint_and_connects_with_them(
         if isinstance(error, ServerError):
             denials.append(error.type)
 
+    # end function record
+
     reader.events().on_error(record)
     await reader.connect()
     reader.segment("chat").subscribe()
@@ -134,3 +150,6 @@ async def test_mints_credentials_through_the_endpoint_and_connects_with_them(
     assert "PermissionDeniedError" in denials
     assert reader.state == "connected"
     await reader.close()
+
+
+# end function test_mints_credentials_through_the_endpoint_and_connects_with_them

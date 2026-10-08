@@ -26,6 +26,9 @@ def load_environment() -> None:
         os.environ.setdefault(key.strip(), value.strip().strip("'\""))
 
 
+# end function load_environment
+
+
 @pytest.fixture(scope="session", autouse=True)
 def realtime() -> str:
     """Fails the run at once when the target cannot be used, instead of
@@ -55,3 +58,6 @@ def realtime() -> str:
         )
 
     return os.environ["CELERIS_WS_URL"]
+
+
+# end function realtime

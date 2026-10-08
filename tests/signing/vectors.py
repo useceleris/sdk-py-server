@@ -13,6 +13,9 @@ class SigningVector(NamedTuple):
     signature: str
 
 
+# end class SigningVector
+
+
 # The reference SDK's fixed synthetic vectors, generated independently with
 # Python's json, base64, hmac and hashlib.sha512. Only the claims are spelled
 # the Python way (segment_id, lookback_ms, allow_echo); every expected value

@@ -31,6 +31,9 @@ def _check_well_formed(value: str) -> str:
     return value
 
 
+# end function _check_well_formed
+
+
 def _check_identifier(value: str) -> str:
     if "\r" in value or "\n" in value:
         raise PydanticCustomError("identifier", "Must not contain CR or LF")
@@ -38,11 +41,17 @@ def _check_identifier(value: str) -> str:
     return value
 
 
+# end function _check_identifier
+
+
 def _check_colon_free(value: str) -> str:
     if ":" in value or "\r" in value or "\n" in value:
         raise PydanticCustomError("identifier", "Must not contain a colon, CR or LF")
 
     return value
+
+
+# end function _check_colon_free
 
 
 def _check_channel_reference(value: str) -> str:
@@ -64,6 +73,9 @@ def _check_channel_reference(value: str) -> str:
     return value
 
 
+# end function _check_channel_reference
+
+
 def _check_references(references: list[str]) -> list[str]:
     if not references:
         raise PydanticCustomError(
@@ -76,6 +88,9 @@ def _check_references(references: list[str]) -> list[str]:
     return references
 
 
+# end function _check_references
+
+
 def _check_segments(segments: list["SegmentClaim"]) -> list["SegmentClaim"]:
     segment_ids = [segment["segment_id"] for segment in segments]
 
@@ -85,8 +100,14 @@ def _check_segments(segments: list["SegmentClaim"]) -> list["SegmentClaim"]:
     return segments
 
 
+# end function _check_segments
+
+
 def _kind(value: object) -> object:
     return value.get("kind") if isinstance(value, dict) else None
+
+
+# end function _kind
 
 
 # A fixed message: pydantic's own would quote the kind the caller sent.
@@ -114,11 +135,17 @@ class AllChannels(TypedDict):
     kind: Literal["all"]
 
 
+# end class AllChannels
+
+
 class RestrictedChannels(TypedDict):
     """Only the listed channels."""
 
     kind: Literal["restricted"]
     references: Annotated[list[ChannelReference], AfterValidator(_check_references)]
+
+
+# end class RestrictedChannels
 
 
 ChannelScope: TypeAlias = Annotated[
@@ -136,10 +163,16 @@ class AllSegments(TypedDict):
     write: bool
 
 
+# end class AllSegments
+
+
 class SegmentClaim(TypedDict):
     segment_id: Identifier
     read: bool
     write: bool
+
+
+# end class SegmentClaim
 
 
 class RestrictedSegments(TypedDict):
@@ -147,6 +180,9 @@ class RestrictedSegments(TypedDict):
 
     kind: Literal["restricted"]
     segments: Annotated[list[SegmentClaim], AfterValidator(_check_segments)]
+
+
+# end class RestrictedSegments
 
 
 SegmentPermissions: TypeAlias = Annotated[
@@ -160,11 +196,17 @@ class ReplayLookback(TypedDict):
     lookback_ms: Annotated[int, Field(ge=0, le=MAXIMUM_REPLAY_LOOKBACK_MS)]
 
 
+# end class ReplayLookback
+
+
 def _replay_shape(value: object) -> str | None:
     if isinstance(value, bool):
         return "enabled"
 
     return "lookback" if isinstance(value, dict) else None
+
+
+# end function _replay_shape
 
 
 Replay: TypeAlias = Annotated[
@@ -193,6 +235,9 @@ class SigningClaims(TypedDict):
     allow_echo: NotRequired[bool]
 
 
+# end class SigningClaims
+
+
 SIGNING_CLAIMS = TypeAdapter(SigningClaims)
 
 Timestamp: TypeAlias = Annotated[
@@ -206,6 +251,9 @@ class _SignerOptions(TypedDict):
     client_id: ColonFreeIdentifier
     signing_secret: WellFormedText
     clock: Callable[[], int] | None
+
+
+# end class _SignerOptions
 
 
 SIGNER_OPTIONS = TypeAdapter(_SignerOptions)

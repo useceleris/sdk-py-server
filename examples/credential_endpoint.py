@@ -30,6 +30,9 @@ class User:
     moderator: bool
 
 
+# end class User
+
+
 # Stands in for YOUR authentication: a session cookie, bearer token or the
 # framework's user object. It must never come from the request body.
 def authenticate(authorization: str | None) -> User | None:
@@ -37,6 +40,9 @@ def authenticate(authorization: str | None) -> User | None:
         return None
 
     return User(id="user-8317", rooms=("room-42",), moderator=False)
+
+
+# end function authenticate
 
 
 # The server decides scope. A moderator may write; everyone else reads.
@@ -54,6 +60,9 @@ def claims_for(user: User, channel_reference: str) -> SigningClaims:
         "reference": user.id,
         "replay": {"lookback_ms": 30_000},
     }
+
+
+# end function claims_for
 
 
 class CredentialEndpoint(BaseHTTPRequestHandler):
@@ -86,6 +95,8 @@ class CredentialEndpoint(BaseHTTPRequestHandler):
             200, {"payload": credentials.payload, "signature": credentials.signature}
         )
 
+    # end method do_POST
+
     def respond(self, status: int, body: dict[str, str]) -> None:
         encoded = json.dumps(body).encode()
         self.send_response(status)
@@ -93,6 +104,11 @@ class CredentialEndpoint(BaseHTTPRequestHandler):
         self.send_header("content-length", str(len(encoded)))
         self.end_headers()
         self.wfile.write(encoded)
+
+    # end method respond
+
+
+# end class CredentialEndpoint
 
 
 if __name__ == "__main__":

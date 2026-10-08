@@ -31,6 +31,9 @@ def test_exports_exactly_the_public_surface() -> None:
         assert hasattr(useceleris_server, name), name
 
 
+# end function test_exports_exactly_the_public_surface
+
+
 IMPORT_PROBE = """
 import socket
 import threading
@@ -55,3 +58,6 @@ assert threading.active_count() == 1, "importing started a thread"
 
 def test_importing_opens_no_socket_and_starts_no_work() -> None:
     subprocess.run([sys.executable, "-c", IMPORT_PROBE], check=True)
+
+
+# end function test_importing_opens_no_socket_and_starts_no_work

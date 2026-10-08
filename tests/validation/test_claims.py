@@ -24,8 +24,14 @@ def token_for(claims: object) -> dict[str, Any]:
     return token
 
 
+# end function token_for
+
+
 def token_with(**overrides: object) -> dict[str, Any]:
     return token_for({**copy.deepcopy(CLAIMS), **overrides})
+
+
+# end function token_with
 
 
 def test_constructs_the_exact_deny_all_payload_with_explicit_defaults() -> None:
@@ -45,10 +51,16 @@ def test_constructs_the_exact_deny_all_payload_with_explicit_defaults() -> None:
     ]
 
 
+# end function test_constructs_the_exact_deny_all_payload_with_explicit_defaults
+
+
 def test_accepts_letters_digits_hyphens_and_underscores_in_references() -> None:
     token = token_with(channels={"kind": "restricted", "references": ["room_1-A"]})
 
     assert token["channel_references"] == ["room_1-A"]
+
+
+# end function test_accepts_letters_digits_hyphens_and_underscores_in_references
 
 
 @pytest.mark.parametrize(
@@ -77,6 +89,9 @@ def test_rejects_an_unpaired_surrogate(claim: str, overrides: dict[str, Any]) ->
     )
 
 
+# end function test_rejects_an_unpaired_surrogate
+
+
 def test_keeps_well_formed_non_bmp_characters_in_identifiers() -> None:
     token = token_with(
         reference="user-😀",
@@ -92,6 +107,9 @@ def test_keeps_well_formed_non_bmp_characters_in_identifiers() -> None:
     ]
 
 
+# end function test_keeps_well_formed_non_bmp_characters_in_identifiers
+
+
 def test_names_the_failed_claim_and_rule_without_repeating_the_input() -> None:
     with pytest.raises(ConfigurationError) as caught:
         token_with(channels={"kind": "restricted", "references": ["room 1"]})
@@ -100,6 +118,9 @@ def test_names_the_failed_claim_and_rule_without_repeating_the_input() -> None:
         "Invalid claims. channels.references[0]: Must contain only ASCII letters, "
         "digits, hyphens (-) or underscores (_)."
     )
+
+
+# end function test_names_the_failed_claim_and_rule_without_repeating_the_input
 
 
 @pytest.mark.parametrize("length", [1, 255])
@@ -112,6 +133,9 @@ def test_accepts_channel_length(length: int) -> None:
         ]
         == references
     )
+
+
+# end function test_accepts_channel_length
 
 
 @pytest.mark.parametrize(
@@ -136,6 +160,9 @@ def test_rejects_an_unsafe_channel_list(references: object) -> None:
         token_with(channels={"kind": "restricted", "references": references})
 
 
+# end function test_rejects_an_unsafe_channel_list
+
+
 @pytest.mark.parametrize(
     "channels",
     [None, [], {}, {"kind": "unknown"}, {"kind": "restricted", "references": "room"}],
@@ -145,6 +172,9 @@ def test_rejects_a_malformed_channel_scope(channels: object) -> None:
         token_with(channels=channels)
 
 
+# end function test_rejects_a_malformed_channel_scope
+
+
 def test_names_an_unknown_kind_without_repeating_it() -> None:
     with pytest.raises(ConfigurationError) as caught:
         token_with(channels={"kind": "synthetic-kind"})
@@ -152,6 +182,9 @@ def test_names_an_unknown_kind_without_repeating_it() -> None:
     assert str(caught.value) == (
         "Invalid claims. channels: Must have kind 'all' or 'restricted'."
     )
+
+
+# end function test_names_an_unknown_kind_without_repeating_it
 
 
 @pytest.mark.parametrize(
@@ -176,6 +209,9 @@ def test_preserves_access(read: bool, write: bool) -> None:
     )["token_permission"] == [{"segment_id": "雪", "read": read, "write": write}]
 
 
+# end function test_preserves_access
+
+
 @pytest.mark.parametrize(
     "permissions",
     [
@@ -195,6 +231,9 @@ def test_rejects_malformed_permissions(permissions: object) -> None:
         token_with(permissions=permissions)
 
 
+# end function test_rejects_malformed_permissions
+
+
 @pytest.mark.parametrize("value", ["", "a\r", "a\n", None, 1])
 def test_rejects_an_invalid_segment_and_identity(value: object) -> None:
     with pytest.raises(ConfigurationError):
@@ -207,6 +246,9 @@ def test_rejects_an_invalid_segment_and_identity(value: object) -> None:
                 "segments": [{"segment_id": value, "read": True, "write": False}],
             }
         )
+
+
+# end function test_rejects_an_invalid_segment_and_identity
 
 
 def test_rejects_duplicate_segments_without_merging_grants() -> None:
@@ -224,6 +266,9 @@ def test_rejects_duplicate_segments_without_merging_grants() -> None:
     assert str(caught.value) == (
         "Invalid claims. permissions.segments: Must not repeat a segment ID."
     )
+
+
+# end function test_rejects_duplicate_segments_without_merging_grants
 
 
 def test_copies_nested_claims_preserves_values_and_excludes_extra_fields() -> None:
@@ -254,10 +299,16 @@ def test_copies_nested_claims_preserves_values_and_excludes_extra_fields() -> No
     }
 
 
+# end function test_copies_nested_claims_preserves_values_and_excludes_extra_fields
+
+
 @pytest.mark.parametrize("value", [None, [], "claims", 1])
 def test_rejects_malformed_claims(value: object) -> None:
     with pytest.raises(ConfigurationError, match=r"^Invalid claims\. "):
         token_for(value)
+
+
+# end function test_rejects_malformed_claims
 
 
 def test_rejects_a_colon_in_references_without_restricting_segment_colons() -> None:
@@ -277,6 +328,9 @@ def test_rejects_a_colon_in_references_without_restricting_segment_colons() -> N
     ]
 
 
+# end function test_rejects_a_colon_in_references_without_restricting_segment_colons
+
+
 @pytest.mark.parametrize("missing", ["channels", "permissions"])
 def test_requires_both_scopes_without_defaulting_either(missing: str) -> None:
     claims = {key: value for key, value in CLAIMS.items() if key != missing}
@@ -285,6 +339,9 @@ def test_requires_both_scopes_without_defaulting_either(missing: str) -> None:
         token_for(claims)
 
     assert str(caught.value) == f"Invalid claims. {missing}: Field required."
+
+
+# end function test_requires_both_scopes_without_defaulting_either
 
 
 @pytest.mark.parametrize(
@@ -307,11 +364,17 @@ def test_names_each_rule_exactly(overrides: dict[str, Any], message: str) -> Non
     assert str(caught.value) == f"Invalid claims. {message}"
 
 
+# end function test_names_each_rule_exactly
+
+
 def test_reports_a_claims_value_that_is_not_a_dict_at_the_top() -> None:
     with pytest.raises(ConfigurationError) as caught:
         token_for(None)
 
     assert str(caught.value) == "Invalid claims. Input should be a valid dictionary."
+
+
+# end function test_reports_a_claims_value_that_is_not_a_dict_at_the_top
 
 
 def test_reports_the_first_failure_of_each_value() -> None:
@@ -324,3 +387,6 @@ def test_reports_the_first_failure_of_each_value() -> None:
         "Invalid claims. channels.references[2]: Must contain only ASCII letters, "
         "digits, hyphens (-) or underscores (_)."
     )
+
+
+# end function test_reports_the_first_failure_of_each_value

@@ -37,8 +37,13 @@ def sockets_created(monkeypatch: pytest.MonkeyPatch) -> list[str]:
         created.append(url)
         raise AssertionError("No socket should be created")
 
+    # end function count
+
     monkeypatch.setattr("useceleris_client._connection.WebSocket", count)
     return created
+
+
+# end function sockets_created
 
 
 @dataclass
@@ -46,6 +51,9 @@ class Harness:
     channel: Channel
     states: list[ChannelState] = field(default_factory=list)
     signs: int = 0
+
+
+# end class Harness
 
 
 def harness_with(claims: object) -> Harness:
@@ -59,6 +67,10 @@ def harness_with(claims: object) -> Harness:
             harness.signs += 1
             return signer.sign(value)
 
+        # end method sign
+
+    # end class CountingSigner
+
     provider: CredentialProvider = create_credential_provider(
         signer=CountingSigner(),
         claims=claims,  # type: ignore[arg-type]
@@ -71,15 +83,25 @@ def harness_with(claims: object) -> Harness:
     return harness
 
 
+# end function harness_with
+
+
 class GatedClaims:
     def __init__(self) -> None:
         self.started = asyncio.Event()
         self.release = asyncio.Event()
 
+    # end method __init__
+
     async def __call__(self, request: CredentialRequest) -> SigningClaims:
         self.started.set()
         await self.release.wait()
         return RESTRICTED_CLAIMS
+
+    # end method __call__
+
+
+# end class GatedClaims
 
 
 async def test_close_during_pending_claims_cancels_and_never_signs(
@@ -106,6 +128,9 @@ async def test_close_during_pending_claims_cancels_and_never_signs(
     assert harness.channel.state == "closed"
 
 
+# end function test_close_during_pending_claims_cancels_and_never_signs
+
+
 async def test_cancelling_connect_during_pending_claims_fails_without_a_socket(
     sockets_created: list[str],
 ) -> None:
@@ -127,11 +152,16 @@ async def test_cancelling_connect_during_pending_claims_fails_without_a_socket(
     assert harness.states == ["connecting", "failed"]
 
 
+# end function test_cancelling_connect_during_pending_claims_fails_without_a_socket
+
+
 async def test_a_claims_failure_surfaces_only_the_fixed_safe_error(
     sockets_created: list[str],
 ) -> None:
     def fail(request: CredentialRequest) -> SigningClaims:
         raise RuntimeError(f"synthetic-claims-failure {SIGNING_SECRET}")
+
+    # end function fail
 
     harness = harness_with(fail)
 
@@ -148,3 +178,6 @@ async def test_a_claims_failure_surfaces_only_the_fixed_safe_error(
     assert SIGNING_SECRET not in repr(error)
     assert harness.channel.state == "failed"
     assert sockets_created == []
+
+
+# end function test_a_claims_failure_surfaces_only_the_fixed_safe_error

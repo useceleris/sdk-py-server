@@ -50,8 +50,14 @@ def claims_for(request: CredentialRequest) -> SigningClaims:
     }
 
 
+# end function claims_for
+
+
 def report(error: ChannelError) -> None:
     print("error:", error.type if isinstance(error, ServerError) else error.code)
+
+
+# end function report
 
 
 async def main() -> None:
@@ -75,6 +81,8 @@ async def main() -> None:
         if not delivered.done():
             delivered.set_result(read_text(payload))
 
+    # end function receive
+
     chat.on_message(receive)
     chat.subscribe()
     await asyncio.sleep(1)
@@ -85,6 +93,9 @@ async def main() -> None:
     await channel.close()
 
     print(f"example: ok delivered={body} present={presence.total}")
+
+
+# end function main
 
 
 if __name__ == "__main__":

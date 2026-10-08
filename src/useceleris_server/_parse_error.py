@@ -25,6 +25,9 @@ def validate_input(
     raise ConfigurationError(description)
 
 
+# end function validate_input
+
+
 def describe_parse_error(
     subject: str, error: ValidationError, variant_tags: Collection[str] = ()
 ) -> str:
@@ -44,6 +47,9 @@ def describe_parse_error(
     return f"Invalid {subject}. {' '.join(failures)}"
 
 
+# end function describe_parse_error
+
+
 def _describe_path(location: Iterable[int | str]) -> str:
     path = ""
 
@@ -54,3 +60,6 @@ def _describe_path(location: Iterable[int | str]) -> str:
             path += f".{key}" if path else key
 
     return path
+
+
+# end function _describe_path
