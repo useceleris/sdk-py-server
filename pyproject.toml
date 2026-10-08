@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "useceleris-server"
-version = "0.0.0b3"
+version = "1.0.0"
 description = "Celeris credential signing for trusted servers"
 readme = "README.md"
 license = "Apache-2.0"
@@ -13,7 +13,6 @@ requires-python = ">=3.10"
 authors = [{ name = "David Oyinbo", email = "dev.davexoyinbo@gmail.com" }]
 keywords = ["celeris", "realtime", "websocket", "credentials", "signing"]
 classifiers = [
-  "Development Status :: 4 - Beta",
   "Framework :: AsyncIO",
   "Intended Audience :: Developers",
   "Operating System :: OS Independent",
@@ -33,7 +32,7 @@ classifiers = [
 dependencies = [
   "pydantic>=2.13.5,<3",
   "typing-extensions>=4.14.1",
-  "useceleris-client>=0.0.0b3",
+  "useceleris-client>=1.0.0",
 ]
 
 [project.urls]

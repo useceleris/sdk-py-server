@@ -750,7 +750,7 @@ wheels = [
 
 [[package]]
 name = "useceleris-client"
-version = "0.0.0b3"
+version = "1.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
@@ -758,14 +758,14 @@ dependencies = [
     { name = "websockets", version = "16.1.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "websockets", version = "17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/01/59/76c4e94c0a0d10cf071936b544c0cb7ed342e352eb735382912237dde4ec/useceleris_client-0.0.0b3.tar.gz", hash = "sha256:0024ccd45dd072be1d0039036206222c9b695079cee30fe6de3b5725265cd104", size = 37675, upload-time = "2026-10-03T02:43:25.809Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/09/c6/44581fc0f1e9b0465b211f999ce8fc9e1450b1857b1f1ca5b9e51565e896/useceleris_client-1.0.0.tar.gz", hash = "sha256:563abc034c6293f236784e30e0f7452545150ff8b6ae0377b8e7754761ab65a2", size = 56571, upload-time = "2026-10-08T03:10:06.686Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/4d/f5/d23f10f907b2fdb56baf58334b4f43c6c034cac605eadaf0fd347a2efbe3/useceleris_client-0.0.0b3-py3-none-any.whl", hash = "sha256:63e1771e11f78b1bead591dcabbd3b9491179eac4e62f448ebaf4a1074871327", size = 46868, upload-time = "2026-10-03T02:43:24.88Z" },
+    { url = "https://files.pythonhosted.org/packages/a4/64/fb595d78029d4c9c7106c4340fbb3d93c6c7549e7f1eb36cd9719f073a8a/useceleris_client-1.0.0-py3-none-any.whl", hash = "sha256:86fcf28bf0c90f61b68a42ae22e9d166e02ea6b3ddcdac0279adcbe731bdb859", size = 57223, upload-time = "2026-10-08T03:10:05.686Z" },
 ]
 
 [[package]]
 name = "useceleris-server"
-version = "0.0.0b3"
+version = "1.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "pydantic" },
@@ -787,7 +787,7 @@ dev = [
 requires-dist = [
     { name = "pydantic", specifier = ">=2.13.5,<3" },
     { name = "typing-extensions", specifier = ">=4.14.1" },
-    { name = "useceleris-client", specifier = ">=0.0.0b3" },
+    { name = "useceleris-client", specifier = ">=1.0.0" },
 ]
 
 [package.metadata.requires-dev]
