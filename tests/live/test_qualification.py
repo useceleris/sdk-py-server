@@ -5,7 +5,6 @@ import pytest
 from useceleris_client import CelerisConnectionError, ServerError, read_text
 
 from tests.live.helpers import (
-    GENERATED_MESSAGE_ID,
     all_permission_claims,
     connected_channel,
     next_error,
@@ -124,6 +123,8 @@ class TestServerSignedCredentials:
 
 
 class TestThroughTheProvider:
+    # The message ids are the caller's own, so this suite does not depend on how
+    # the installed client generates ids; the client's own suite checks those.
     async def test_round_trips_a_payload_with_its_id_and_no_self_echo(self) -> None:
         reference = unique_channel_reference("msg")
         claims = all_permission_claims(reference)
@@ -137,12 +138,15 @@ class TestThroughTheProvider:
         receiver.segment("chat").subscribe()
         await asyncio.sleep(1.5)
 
-        await publisher.segment("chat").publish("hello-서버".encode())
+        message_id = f"{reference}_hello"
+        await publisher.segment("chat").publish(
+            "hello-서버".encode(), message_id=message_id
+        )
         message = await next_message(
             receiver.segment("chat"), lambda message: True, "cross-connection delivery"
         )
 
-        assert GENERATED_MESSAGE_ID.fullmatch(message.metadata.message_id)
+        assert message.metadata.message_id == message_id
         assert message.payload.decode() == "hello-서버"
         await asyncio.sleep(1.5)
         assert publisher_saw == []
@@ -159,14 +163,15 @@ class TestThroughTheProvider:
         channel.segment("chat").subscribe()
         await asyncio.sleep(1.5)
 
-        await channel.segment("chat").publish(b"self")
+        message_id = f"{reference}_self"
+        await channel.segment("chat").publish(b"self", message_id=message_id)
         echoed = await next_message(
             channel.segment("chat"),
             lambda message: message.payload == b"self",
             "an echoed publish",
         )
 
-        assert GENERATED_MESSAGE_ID.fullmatch(echoed.metadata.message_id)
+        assert echoed.metadata.message_id == message_id
         await channel.close()
 
     # end method test_echoes_to_the_publisher_when_claims_allow_echo

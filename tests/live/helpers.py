@@ -1,7 +1,6 @@
 import asyncio
 import itertools
 import os
-import re
 import time
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
@@ -24,10 +23,6 @@ from useceleris_server import (
     create_credential_provider,
     create_signer,
 )
-
-# The client gives every publish its own id, which the server delivers as is
-# (RESEND-01): 16 random bytes, hex-encoded.
-GENERATED_MESSAGE_ID = re.compile("[0-9a-f]{32}")
 
 Value = TypeVar("Value")
 
