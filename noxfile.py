@@ -37,11 +37,17 @@ def requirement(name: str) -> str:
     return next(entry for entry in DEVELOPMENT if entry.split("==")[0] == name)
 
 
+# end function requirement
+
+
 def install_development(session: nox.Session) -> None:
     if CLIENT_SOURCE:
         session.install("-e", CLIENT_SOURCE)
 
     session.install("-e", ".", *DEVELOPMENT)
+
+
+# end function install_development
 
 
 @nox.session(python="3.14")
@@ -51,10 +57,16 @@ def lint(session: nox.Session) -> None:
     session.run("ruff", "format", "--check", ".")
 
 
+# end function lint
+
+
 @nox.session(python="3.14")
 def typecheck(session: nox.Session) -> None:
     install_development(session)
     session.run("mypy")
+
+
+# end function typecheck
 
 
 @nox.session(python=PYTHONS)
@@ -63,10 +75,16 @@ def tests(session: nox.Session) -> None:
     session.run("pytest", *session.posargs)
 
 
+# end function tests
+
+
 @nox.session(python=PYTHONS)
 def live(session: nox.Session) -> None:
     install_development(session)
     session.run("pytest", "-m", "live", "tests/live", *session.posargs)
+
+
+# end function live
 
 
 @nox.session(python=PYTHONS)
@@ -124,6 +142,9 @@ def package(session: nox.Session) -> None:
         session.run("mypy", "--strict", ".")
 
 
+# end function package
+
+
 SIGN_VECTORS = """
 from vectors import SIGNING_VECTORS
 from useceleris_server import create_signer
@@ -162,3 +183,6 @@ def check_wheel(wheel: Path) -> None:
         Requirement(entry).name for entry in metadata.get_all("Requires-Dist") or []
     }
     assert required == RUNTIME_DEPENDENCIES, required
+
+
+# end function check_wheel
