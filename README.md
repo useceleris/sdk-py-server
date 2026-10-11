@@ -74,7 +74,7 @@ broad = signer.sign(
 | `replay`      | `False`, `True` for the server's default replay window, or `{"lookback_ms": int}` from 0 to 4294967295                                                                                            | `False`  |
 | `allow_echo`  | `True` lets a connection receive its own publishes                                                                                                                                               | `False`  |
 
-Validation is strict: `1` is not a `bool`, a tuple is not a list, and text with unpaired surrogates is refused. Keys beyond these are ignored, so never rely on one to grant or restrict anything. A member with `write` but not `read` receives nothing, silently. `SigningClaims` and its parts (`ChannelScope`, `SegmentPermissions`, `SegmentClaim`, `ReplayLookback`, and the `All*` / `Restricted*` shapes) are exported for annotations.
+Validation is strict: `1` is not a `bool`, a tuple is not a list, and text with unpaired surrogates is refused. Keys beyond these are ignored, so never rely on one to grant or restrict anything. A subscription needs `read` and a publish needs `write`: a write-only token publishes and cannot subscribe, and a read-only token subscribes and cannot publish. The server refuses the subscription of a write-only token with a `PermissionDeniedError`. `SigningClaims` and its parts (`ChannelScope`, `SegmentPermissions`, `SegmentClaim`, `ReplayLookback`, and the `All*` / `Restricted*` shapes) are exported for annotations.
 
 ## A credential endpoint
 
